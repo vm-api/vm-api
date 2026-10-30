@@ -9,11 +9,10 @@ package v1alpha1
 // PowerState describes a virtual machine's power state.
 //
 // The values are spelled "PoweredOn" and "PoweredOff" rather than "On" and
-// "Off" for two reasons. First, "On", "Off", "Yes", and "No" are boolean
+// "Off" because "On", "Off", "Yes", and "No" are boolean
 // literals in YAML 1.1, which kubectl follows, so an unquoted
 // `powerState: On` parses as the boolean true and is rejected by the API
-// server. Second, these spellings match VM Operator's existing
-// VirtualMachinePowerState, so the vSphere provider needs no value mapping.
+// server.
 //
 // Suspended does not generalize cleanly, and is retained as a capability-gated
 // value rather than a universally supported one.
@@ -218,7 +217,7 @@ type ObjectReference struct {
 	// +required
 
 	// APIGroup of the referent, as a fully qualified domain name — for example
-	// "kube-vm.io" or "infrastructure.vsphere.kube-vm.io".
+	// "vm-api.io" or "infrastructure.vsphere.vm-api.io".
 	APIGroup string `json:"apiGroup"`
 
 	// +kubebuilder:validation:MinLength=1

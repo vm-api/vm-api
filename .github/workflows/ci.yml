@@ -1,6 +1,6 @@
 name: ci
 
-# Follow VM Operator's separate lint jobs and release-branch PR coverage.
+# Run separate lint jobs for main and release-branch pull requests.
 on:
   pull_request:
     branches:

@@ -268,8 +268,7 @@ type DiskSpec struct {
 // interface: a host name is singular, and a resolver list is conventionally
 // system-wide. Giving those a home alongside the interface list keeps a single
 // concern in a single place, and leaves room to add further guest-wide settings
-// without further widening the top-level spec. VM Operator arrived at the same
-// shape in its spec.network.
+// without further widening the top-level spec.
 //
 // Every field here is deliberately one the API itself can render into guest
 // network configuration, which is why each has a translation on more than one
@@ -657,7 +656,7 @@ type VirtualMachineStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:storageversion
-// +kubebuilder:resource:shortName=vm;vms,categories=kubevm
+// +kubebuilder:resource:shortName=vm;vms,categories=vm-api
 // +kubebuilder:printcolumn:name="Power",type=string,JSONPath=`.status.powerState`
 // +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
 // +kubebuilder:printcolumn:name="Reason",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].reason`

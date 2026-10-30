@@ -13,7 +13,7 @@ A `VirtualMachine` describes compute, storage, networking, guest bootstrap, and 
 - Provider-reported power state, addresses, identity, metadata, and readiness conditions.
 - Generated CRDs with schema validation, defaults, and printer columns.
 
-The current API is `kube-vm.io/v1alpha1`. API evolution and provider compatibility are active development areas; see the [roadmap](ROADMAP.md). The API group shown here matches the checked-in types and manifests.
+The current API is `vm-api.io/v1alpha1`. API evolution and provider compatibility are active development areas; see the [roadmap](ROADMAP.md). The API group shown here matches the checked-in types and manifests.
 
 ## Documentation
 
@@ -84,6 +84,19 @@ kubectl apply -f config/samples/virtualmachine.yaml
 ```
 
 Installing the CRD alone does not provision a VM. Both controllers and the referenced provider resource are required. The sample illustrates the API shape; its catalog and provider references must be adapted to resources supported by your provider.
+
+## Go modules
+
+Import the API types from `github.com/vm-api/vm-api/api/v1alpha1`.
+The core controller is a separate module, `github.com/vm-api/vm-api/controller`.
+Its local `replace` directive uses the API module from the same checkout.
+
+Go module release versions and Kubernetes API versions are independent. A Go
+release tag does not change the served or storage API version. Root module
+release tags use `vX.Y.Z`; controller module tags use `controller/vX.Y.Z`.
+Before publishing a controller module for external consumers, replace its local
+API dependency placeholder with a published API module version: downstream Go
+modules do not inherit dependency `replace` directives.
 
 ## API scope and compatibility
 

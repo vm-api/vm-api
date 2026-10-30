@@ -30,12 +30,12 @@ help: ## Display this help
 ginkgo: $(GINKGO) ## Install ginkgo
 $(GINKGO): go.mod
 	GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) \
-	go build -tags=vmop_tools -o $(@) github.com/onsi/ginkgo/v2/ginkgo
+	go build -tags=vm_api_tools -o $(@) github.com/onsi/ginkgo/v2/ginkgo
 
 setup-envtest: $(SETUP_ENVTEST) ## Install setup-envtest
 $(SETUP_ENVTEST): go.mod
 	GOOS=$(GOHOSTOS) GOARCH=$(GOHOSTARCH) \
-	go build -tags=vmop_tools -o $(@) sigs.k8s.io/controller-runtime/tools/setup-envtest
+	go build -tags=vm_api_tools -o $(@) sigs.k8s.io/controller-runtime/tools/setup-envtest
 
 .PHONY: k8s-envtest
 k8s-envtest: $(SETUP_ENVTEST) ## Download envtest binaries

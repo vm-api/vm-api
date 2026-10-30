@@ -11,11 +11,11 @@ VM API separates portable virtual machine configuration from infrastructure-spec
 | [Provider status contract](../controller/internal/contract/contract.go) | Common fields and conditions read without provider-specific Go imports |
 | Infrastructure provider | Platform-specific configuration, provisioning, observation, and cleanup |
 
-The current API group and version are `kube-vm.io/v1alpha1`.
+The current API group and version are `vm-api.io/v1alpha1`.
 
 ## Resource relationship
 
-A generic VM's `spec.infrastructureRef` identifies the API group, kind, and name of a provider resource in the same namespace. Kubernetes discovery supplies the preferred served version. The provider resource carries a `kube-vm.io/virtual-machine` annotation naming the generic VM, allowing the controllers to verify the relationship before adoption.
+A generic VM's `spec.infrastructureRef` identifies the API group, kind, and name of a provider resource in the same namespace. Kubernetes discovery supplies the preferred served version. The provider resource carries a `vm-api.io/virtual-machine` annotation naming the generic VM, allowing the controllers to verify the relationship before adoption.
 
 The user or a higher-level controller creates both resources. The generic controller does not create provider resources or write their desired configuration. It establishes an owner reference, observes provider status, and coordinates deletion through a finalizer. The provider controller is responsible for applying desired configuration to the infrastructure and cleaning up its platform resources.
 

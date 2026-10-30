@@ -1,6 +1,5 @@
 # Config for the https://github.com/crate-ci/typos spell checker, run via
-# "make typos". Trimmed from the parent vm-operator repo's _typos.toml to what
-# is relevant for this module.
+# "make typos".
 
 [files]
 extend-exclude = [

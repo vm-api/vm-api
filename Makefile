@@ -2,16 +2,8 @@
 # The term "Broadcom" refers to Broadcom Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: Apache-2.0
 
-# This Makefile follows the conventions of the parent vm-operator repo's
-# Makefile: the same target names (generate / generate-go / generate-manifests,
-# lint / lint-go-full, modules, verify-codegen), the same help mechanism, the
-# same OS/arch-scoped tooling directory, and the same podman-locally /
-# docker-in-CI container-runtime selection.
-#
-# It deliberately does NOT replicate the parent's hack/tools sub-module. This
-# module needs two tools, so they are installed by pinned version directly. Tool
-# versions below are kept in sync with the parent's hack/tools/go.mod so the
-# generated output does not churn depending on which tree you run this from.
+# API code generation, dependency management, and validation targets.
+# Development tools are installed at pinned versions below.
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
@@ -30,7 +22,7 @@ CRD_ROOT      := $(ROOT_DIR)/config/crd/bases
 CONTROLLER_GEN := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/controller-gen
 GOLANGCI_LINT  := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/golangci-lint
 
-# Tool versions, kept in sync with the parent repo's hack/tools/go.mod.
+# Pinned development tool versions.
 CONTROLLER_TOOLS_VERSION := v0.21.0
 GOLANGCI_LINT_VERSION    := v2.1.6
 
@@ -38,7 +30,7 @@ GOLANGCI_LINT_VERSION    := v2.1.6
 BOILERPLATE := ./hack/boilerplate/boilerplate.generatego.txt
 
 # CRI_BIN is the path to the container runtime binary, used by the
-# container-based linters. Same selection logic as the parent repo.
+# container-based linters.
 ifeq (,$(strip $(GITHUB_RUN_ID)))
 # Prefer podman locally.
 CRI_BIN := $(shell command -v podman 2>/dev/null || command -v docker 2>/dev/null)

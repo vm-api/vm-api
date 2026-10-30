@@ -22,8 +22,8 @@ import (
 	ctrlmgr "sigs.k8s.io/controller-runtime/pkg/manager"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	kubevmv1a1 "github.com/vmware-tanzu/vm-operator/external/kubevm/api/v1alpha1"
-	"github.com/vmware-tanzu/vm-operator/external/kubevm/controller/controllers/virtualmachine"
+	vmv1alpha1 "github.com/vm-api/vm-api/api/v1alpha1"
+	"github.com/vm-api/vm-api/controller/controllers/virtualmachine"
 )
 
 func TestVirtualMachine(t *testing.T) {
@@ -45,10 +45,10 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{
 			// The generic API CRD, from the sibling api module
-			// (external/kubevm/config/crd/bases).
+			// (config/crd/bases).
 			filepath.Join("..", "..", "..", "config", "crd", "bases"),
 			// This module's own stub provider CRD
-			// (external/kubevm/controller/config/crd).
+			// (controller/config/crd).
 			filepath.Join("..", "..", "config", "crd"),
 		},
 		ErrorIfCRDPathMissing: true,
@@ -60,7 +60,7 @@ var _ = BeforeSuite(func() {
 
 	scheme := runtime.NewScheme()
 	Expect(clientgoscheme.AddToScheme(scheme)).To(Succeed())
-	Expect(kubevmv1a1.AddToScheme(scheme)).To(Succeed())
+	Expect(vmv1alpha1.AddToScheme(scheme)).To(Succeed())
 
 	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
 	Expect(err).ToNot(HaveOccurred())

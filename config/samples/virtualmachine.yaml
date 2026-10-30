@@ -1,4 +1,4 @@
-# A portable KubeVM VirtualMachine, paired with a provider object it points at.
+# A portable VM API VirtualMachine, paired with a provider object it points at.
 #
 # The user applies both: this portable object, and the provider object named by
 # spec.infrastructureRef. The core controller adopts the provider object by
@@ -8,7 +8,7 @@
 # group and kind explicitly. No version appears in a reference: the served
 # version is resolved at runtime, so a provider can roll its API forward without
 # every VirtualMachine that points at it having to be rewritten.
-apiVersion: kube-vm.io/v1alpha1
+apiVersion: vm-api.io/v1alpha1
 kind: VirtualMachine
 metadata:
   name: web-01
@@ -23,7 +23,7 @@ spec:
   bootDisk:
     source:
       image:
-        apiGroup: kube-vm.io
+        apiGroup: vm-api.io
         kind: VirtualMachineImage
         name: ubuntu-2204
     sizeGiB: 50
@@ -43,7 +43,7 @@ spec:
     interfaces:
       - name: eth0
         network:
-          apiGroup: infrastructure.vsphere.kube-vm.io
+          apiGroup: infrastructure.vsphere.vm-api.io
           kind: Network
           name: app-net
         dhcp4: true
@@ -69,6 +69,6 @@ spec:
   # Change these two lines (group and kind) plus the provider object itself to
   # retarget this VM at a different platform. The rest of the spec is portable.
   infrastructureRef:
-    apiGroup: infrastructure.vsphere.kube-vm.io
+    apiGroup: infrastructure.vsphere.vm-api.io
     kind: VSphereVirtualMachine
     name: web-01

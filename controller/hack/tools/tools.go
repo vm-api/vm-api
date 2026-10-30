@@ -1,5 +1,5 @@
-//go:build vmop_tools
-// +build vmop_tools
+//go:build vm_api_tools
+// +build vm_api_tools
 
 // © Broadcom. All Rights Reserved.
 // The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.

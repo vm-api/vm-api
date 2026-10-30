@@ -2,7 +2,7 @@
 // The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package virtualmachine reconciles a kube-vm.io VirtualMachine by adopting
+// Package virtualmachine reconciles a vm-api.io VirtualMachine by adopting
 // the provider object its spec.infrastructureRef names, mirroring that
 // object's status onto fixed contract paths, and deleting it when the
 // generic object is deleted.
@@ -28,28 +28,25 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 
-	kubevmv1a1 "github.com/vmware-tanzu/vm-operator/external/kubevm/api/v1alpha1"
-	"github.com/vmware-tanzu/vm-operator/external/kubevm/controller/internal/contract"
+	vmv1alpha1 "github.com/vm-api/vm-api/api/v1alpha1"
+	"github.com/vm-api/vm-api/controller/internal/contract"
 )
 
 const (
 	// finalizerName is set on every generic VirtualMachine this controller
 	// adopts a provider object for, so the provider object can be deleted
 	// before the generic object is allowed to go away.
-	finalizerName = "kube-vm.io/virtualmachine"
+	finalizerName = "vm-api.io/virtualmachine"
 
 	// annotationKey is the annotation a provider object carries to declare
-	// which generic VirtualMachine adopted it. Mirrors
-	// github.com/vmware-tanzu/vm-operator/pkg/kubevm.AnnotationKey, which
-	// this module cannot import without depending on the root module.
-	annotationKey = "kube-vm.io/virtual-machine"
+	// which generic VirtualMachine adopted it. Providers must use the same
+	// annotation key to establish the relationship.
+	annotationKey = "vm-api.io/virtual-machine"
 
 	// pollRequeueDelay is the delay used to requeue while waiting on state
 	// this controller cannot watch directly: a provider object that does
 	// not exist yet or does not yet link back, and a provider object that
-	// has not yet reported an address. Mirrors the root module's
-	// pkgcfg.Default().PoweredOnVMHasIPRequeueDelay, which this module
-	// cannot import.
+	// has not yet reported an address.
 	pollRequeueDelay = 10 * time.Second
 
 	readyConditionType               = "Ready"
@@ -57,9 +54,10 @@ const (
 	upToDateConditionType            = "UpToDate"
 )
 
-// +kubebuilder:rbac:groups=kube-vm.io,resources=virtualmachines,verbs=get;list;watch;update;patch;delete
-// +kubebuilder:rbac:groups=kube-vm.io,resources=virtualmachines/status,verbs=get;update;patch
-// +kubebuilder:rbac:groups=vmoperator.vmware.com,resources=virtualmachines,verbs=get;list;watch;update;patch;delete
+// +kubebuilder:rbac:groups=vm-api.io,resources=virtualmachines,verbs=get;list;watch;update;patch;delete
+// +kubebuilder:rbac:groups=vm-api.io,resources=virtualmachines/status,verbs=get;update;patch
+// Provider-resource RBAC must be supplied by the deployment for its chosen
+// infrastructure API groups and resources.
 
 // AddToManager adds this package's controller to the provided manager.
 func AddToManager(mgr manager.Manager) error {
@@ -69,12 +67,12 @@ func AddToManager(mgr manager.Manager) error {
 	}
 
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&kubevmv1a1.VirtualMachine{}).
-		Named("kubevm-virtualmachine").
+		For(&vmv1alpha1.VirtualMachine{}).
+		Named("vm-api-virtualmachine").
 		Complete(r)
 }
 
-// Reconciler reconciles a kube-vm.io VirtualMachine.
+// Reconciler reconciles a vm-api.io VirtualMachine.
 type Reconciler struct {
 	client.Client
 	Mapper meta.RESTMapper
@@ -84,7 +82,7 @@ type Reconciler struct {
 // linkage is mutual, mirrors its status onto the fixed contract paths, and
 // deletes it when the generic object is deleted.
 func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	vm := &kubevmv1a1.VirtualMachine{}
+	vm := &vmv1alpha1.VirtualMachine{}
 	if err := r.Get(ctx, req.NamespacedName, vm); err != nil {
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
@@ -101,7 +99,7 @@ func (r *Reconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Resu
 // named group/kind. The generic object's InfrastructureRef carries no
 // version, since the core does not know a provider's served versions ahead
 // of time.
-func (r *Reconciler) providerGVK(ref kubevmv1a1.ObjectReference) (schema.GroupVersionKind, error) {
+func (r *Reconciler) providerGVK(ref vmv1alpha1.ObjectReference) (schema.GroupVersionKind, error) {
 	mapping, err := r.Mapper.RESTMapping(schema.GroupKind{Group: ref.APIGroup, Kind: ref.Kind})
 	if err != nil {
 		return schema.GroupVersionKind{}, fmt.Errorf(
@@ -114,7 +112,7 @@ func (r *Reconciler) providerGVK(ref kubevmv1a1.ObjectReference) (schema.GroupVe
 // unstructured, importing no provider types. It never creates the object.
 func (r *Reconciler) getProvider(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine) (*unstructured.Unstructured, error) {
+	vm *vmv1alpha1.VirtualMachine) (*unstructured.Unstructured, error) {
 	gvk, err := r.providerGVK(vm.Spec.InfrastructureRef)
 	if err != nil {
 		return nil, err
@@ -137,19 +135,19 @@ func (r *Reconciler) getProvider(
 // this generic object back. The generic object's own spec.infrastructureRef
 // naming the provider object is a given, since that is how the provider
 // object was found.
-func isMutuallyLinked(vm *kubevmv1a1.VirtualMachine, provider *unstructured.Unstructured) bool {
+func isMutuallyLinked(vm *vmv1alpha1.VirtualMachine, provider *unstructured.Unstructured) bool {
 	return provider.GetAnnotations()[annotationKey] == vm.Name
 }
 
 // conflictingOwner returns a non-nil error when the provider object already
 // carries a controller owner reference naming a generic VirtualMachine
 // other than the given one.
-func conflictingOwner(vm *kubevmv1a1.VirtualMachine, provider *unstructured.Unstructured) error {
+func conflictingOwner(vm *vmv1alpha1.VirtualMachine, provider *unstructured.Unstructured) error {
 	for _, ref := range provider.GetOwnerReferences() {
 		if ref.Controller == nil || !*ref.Controller {
 			continue
 		}
-		if ref.APIVersion != kubevmv1a1.GroupVersion.String() || ref.Kind != "VirtualMachine" {
+		if ref.APIVersion != vmv1alpha1.GroupVersion.String() || ref.Kind != "VirtualMachine" {
 			continue
 		}
 		if ref.Name != vm.Name {
@@ -163,7 +161,7 @@ func conflictingOwner(vm *kubevmv1a1.VirtualMachine, provider *unstructured.Unst
 
 func (r *Reconciler) reconcileNormal(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine) (ctrl.Result, error) {
+	vm *vmv1alpha1.VirtualMachine) (ctrl.Result, error) {
 	if !controllerutil.ContainsFinalizer(vm, finalizerName) {
 		base := vm.DeepCopy()
 		controllerutil.AddFinalizer(vm, finalizerName)
@@ -209,7 +207,7 @@ func (r *Reconciler) reconcileNormal(
 // wholesale with no conflict detection against a concurrent writer.
 func (r *Reconciler) ensureOwnerReference(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine,
+	vm *vmv1alpha1.VirtualMachine,
 	provider *unstructured.Unstructured) error {
 	return retry.RetryOnConflict(retry.DefaultRetry, func() error {
 		base := provider.DeepCopy()
@@ -217,7 +215,7 @@ func (r *Reconciler) ensureOwnerReference(
 		isController := true
 		blockOwnerDeletion := true
 		ownerRef := metav1.OwnerReference{
-			APIVersion:         kubevmv1a1.GroupVersion.String(),
+			APIVersion:         vmv1alpha1.GroupVersion.String(),
 			Kind:               "VirtualMachine",
 			Name:               vm.Name,
 			UID:                vm.UID,
@@ -252,7 +250,7 @@ func (r *Reconciler) ensureOwnerReference(
 // object.
 func (r *Reconciler) setNotAdopted(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine,
+	vm *vmv1alpha1.VirtualMachine,
 	message string) error {
 	base := vm.DeepCopy()
 
@@ -271,7 +269,7 @@ func (r *Reconciler) setNotAdopted(
 
 func (r *Reconciler) reconcileStatus(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine,
+	vm *vmv1alpha1.VirtualMachine,
 	provider *unstructured.Unstructured) (ctrl.Result, error) {
 	base := vm.DeepCopy()
 
@@ -280,16 +278,16 @@ func (r *Reconciler) reconcileStatus(
 		return ctrl.Result{}, fmt.Errorf("failed to read provider status: %w", err)
 	}
 
-	vm.Status.PowerState = kubevmv1a1.PowerState(status.PowerState)
+	vm.Status.PowerState = vmv1alpha1.PowerState(status.PowerState)
 	vm.Status.ProviderID = status.ProviderID
 	vm.Status.ProviderMetadata = status.ProviderMetadata
 	vm.Status.ObservedGeneration = vm.Generation
 
 	vm.Status.Addresses = nil
 	for _, a := range status.Addresses {
-		vm.Status.Addresses = append(vm.Status.Addresses, kubevmv1a1.VirtualMachineAddress{
+		vm.Status.Addresses = append(vm.Status.Addresses, vmv1alpha1.VirtualMachineAddress{
 			Interface: a.Interface,
-			Type:      kubevmv1a1.VirtualMachineAddressType(a.Type),
+			Type:      vmv1alpha1.VirtualMachineAddressType(a.Type),
 			Address:   a.Address,
 		})
 	}
@@ -337,7 +335,7 @@ func (r *Reconciler) reconcileStatus(
 
 func (r *Reconciler) reconcileDelete(
 	ctx context.Context,
-	vm *kubevmv1a1.VirtualMachine) (ctrl.Result, error) {
+	vm *vmv1alpha1.VirtualMachine) (ctrl.Result, error) {
 	if !controllerutil.ContainsFinalizer(vm, finalizerName) {
 		return ctrl.Result{}, nil
 	}

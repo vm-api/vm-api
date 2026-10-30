@@ -1,20 +1,16 @@
-module github.com/vmware-tanzu/vm-operator/external/kubevm/controller
+module github.com/vm-api/vm-api/controller
 
-//
-// This module is the generic kube-vm.io core reconciler. It depends on the
-// API module in the parent directory via a replace, and never on the root
-// vm-operator module — nesting here keeps this controller moving with the
-// API when this module relocates to its own repository.
-//
+// The core controller uses the API module in the parent directory.
+// The local replacement keeps API and controller development in sync.
 go 1.23.0
 
-replace github.com/vmware-tanzu/vm-operator/external/kubevm => ../
+replace github.com/vm-api/vm-api => ../
 
 require (
 	github.com/google/uuid v1.6.0
 	github.com/onsi/ginkgo/v2 v2.19.0
 	github.com/onsi/gomega v1.33.1
-	github.com/vmware-tanzu/vm-operator/external/kubevm v0.0.0-00010101000000-000000000000
+	github.com/vm-api/vm-api v0.0.0-00010101000000-000000000000
 	k8s.io/api v0.31.0
 	k8s.io/apimachinery v0.31.0
 	k8s.io/client-go v0.31.0

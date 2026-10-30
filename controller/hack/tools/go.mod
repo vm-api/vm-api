@@ -1,4 +1,4 @@
-module github.com/vmware-tanzu/vm-operator/external/kubevm/controller/hack/tools
+module github.com/vm-api/vm-api/controller/hack/tools
 
 go 1.23.0
 

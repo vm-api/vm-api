@@ -4,7 +4,7 @@ This roadmap describes development priorities for the portable VM API and provid
 
 ## Current capabilities
 
-The repository includes `kube-vm.io/v1alpha1` API types, generated CRDs, a generic controller, and a [provider authoring guide](docs/implementing-a-provider.md). The controller coordinates ownership and deletion of provider resources and reports their lifecycle state through the [provider status contract](controller/internal/contract/contract.go).
+The repository includes `vm-api.io/v1alpha1` API types, generated CRDs, a generic controller, and a [provider authoring guide](docs/implementing-a-provider.md). The controller coordinates ownership and deletion of provider resources and reports their lifecycle state through the [provider status contract](controller/internal/contract/contract.go).
 
 ## 1. API and provider contract
 

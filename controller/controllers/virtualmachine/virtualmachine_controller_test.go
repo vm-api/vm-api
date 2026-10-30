@@ -18,13 +18,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	kubevmv1a1 "github.com/vmware-tanzu/vm-operator/external/kubevm/api/v1alpha1"
+	vmv1alpha1 "github.com/vm-api/vm-api/api/v1alpha1"
 )
 
 const (
-	annotationKey = "kube-vm.io/virtual-machine"
+	annotationKey = "vm-api.io/virtual-machine"
 
-	stubGroup   = "infrastructure.stub.kube-vm.io"
+	stubGroup   = "infrastructure.stub.vm-api.io"
 	stubVersion = "v1alpha1"
 	stubKind    = "StubVirtualMachine"
 )
@@ -52,7 +52,7 @@ var _ = Describe("Reconcile", func() {
 		vmKey      types.NamespacedName
 		providerNS string
 		provider   *unstructured.Unstructured
-		vm         *kubevmv1a1.VirtualMachine
+		vm         *vmv1alpha1.VirtualMachine
 	)
 
 	BeforeEach(func() {
@@ -67,13 +67,13 @@ var _ = Describe("Reconcile", func() {
 
 		provider = newStubProvider(providerNS, "provider-"+uuid.NewString())
 
-		vm = &kubevmv1a1.VirtualMachine{
+		vm = &vmv1alpha1.VirtualMachine{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      vmKey.Name,
 				Namespace: vmKey.Namespace,
 			},
-			Spec: kubevmv1a1.VirtualMachineSpec{
-				InfrastructureRef: kubevmv1a1.ObjectReference{
+			Spec: vmv1alpha1.VirtualMachineSpec{
+				InfrastructureRef: vmv1alpha1.ObjectReference{
 					APIGroup: stubGroup,
 					Kind:     stubKind,
 					Name:     provider.GetName(),
@@ -123,13 +123,13 @@ var _ = Describe("Reconcile", func() {
 			Expect(k8sClient.Status().Update(ctx, p)).To(Succeed())
 
 			Eventually(func(g Gomega) {
-				obj := &kubevmv1a1.VirtualMachine{}
+				obj := &vmv1alpha1.VirtualMachine{}
 				g.Expect(k8sClient.Get(ctx, vmKey, obj)).To(Succeed())
-				g.Expect(obj.Status.PowerState).To(Equal(kubevmv1a1.PowerStateOn))
+				g.Expect(obj.Status.PowerState).To(Equal(vmv1alpha1.PowerStateOn))
 				g.Expect(obj.Status.ProviderID).To(Equal("vm-provider-id"))
-				g.Expect(obj.Status.Addresses).To(ConsistOf(kubevmv1a1.VirtualMachineAddress{
+				g.Expect(obj.Status.Addresses).To(ConsistOf(vmv1alpha1.VirtualMachineAddress{
 					Interface: "eth0",
-					Type:      kubevmv1a1.VirtualMachineAddressInternalIP,
+					Type:      vmv1alpha1.VirtualMachineAddressInternalIP,
 					Address:   "10.0.0.9",
 				}))
 				g.Expect(obj.Status.Ready).To(BeTrue())
@@ -151,7 +151,7 @@ var _ = Describe("Reconcile", func() {
 			}).Should(Succeed())
 
 			Eventually(func(g Gomega) {
-				obj := &kubevmv1a1.VirtualMachine{}
+				obj := &vmv1alpha1.VirtualMachine{}
 				g.Expect(k8sClient.Get(ctx, vmKey, obj)).To(Succeed())
 				g.Expect(obj.Status.Ready).To(BeFalse())
 			}).Should(Succeed())
@@ -163,7 +163,7 @@ var _ = Describe("Reconcile", func() {
 			isController := true
 			provider.SetOwnerReferences([]metav1.OwnerReference{
 				{
-					APIVersion: kubevmv1a1.GroupVersion.String(),
+					APIVersion: vmv1alpha1.GroupVersion.String(),
 					Kind:       "VirtualMachine",
 					Name:       "some-other-generic-vm",
 					UID:        types.UID(uuid.NewString()),
@@ -216,7 +216,7 @@ var _ = Describe("Reconcile", func() {
 			Expect(k8sClient.Create(ctx, vm)).To(Succeed())
 
 			Eventually(func(g Gomega) {
-				obj := &kubevmv1a1.VirtualMachine{}
+				obj := &vmv1alpha1.VirtualMachine{}
 				g.Expect(k8sClient.Get(ctx, vmKey, obj)).To(Succeed())
 				g.Expect(obj.Finalizers).ToNot(BeEmpty())
 			}).Should(Succeed())
@@ -232,7 +232,7 @@ var _ = Describe("Reconcile", func() {
 			}).Should(Succeed())
 
 			Eventually(func(g Gomega) {
-				obj := &kubevmv1a1.VirtualMachine{}
+				obj := &vmv1alpha1.VirtualMachine{}
 				err := k8sClient.Get(ctx, vmKey, obj)
 				g.Expect(apierrors.IsNotFound(err)).To(BeTrue())
 			}).Should(Succeed())

@@ -1,14 +1,7 @@
-module github.com/vmware-tanzu/vm-operator/external/kubevm
+module github.com/vm-api/vm-api
 
-//
-// Keep these dependencies as LOW as practical.
-//
-// This module is an API types module intended to be imported by provider
-// implementations. Following the same reasoning as the sibling
-// github.com/vmware-tanzu/vm-operator/api module, a low floor maximizes the
-// range of Kubernetes versions a consumer can build against. Do not bump these
-// to match the root vm-operator module.
-//
+// Keep API dependencies as low as practical so provider implementations can
+// build against a broad range of Kubernetes versions.
 go 1.23.0
 
 require (

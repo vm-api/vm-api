@@ -2,9 +2,7 @@
 // The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
 // SPDX-License-Identifier: Apache-2.0
 
-// Command controller runs the generic kube-vm.io core reconciler. It is
-// intended to run out-of-cluster against a Supervisor namespace for the PoC
-// demo; see ../../../hack/demo/kubevm/README.md.
+// Command controller runs the provider-agnostic VM API core reconciler.
 package main
 
 import (
@@ -17,8 +15,8 @@ import (
 	ctrlsig "sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	kubevmv1a1 "github.com/vmware-tanzu/vm-operator/external/kubevm/api/v1alpha1"
-	"github.com/vmware-tanzu/vm-operator/external/kubevm/controller/controllers/virtualmachine"
+	vmv1alpha1 "github.com/vm-api/vm-api/api/v1alpha1"
+	"github.com/vm-api/vm-api/controller/controllers/virtualmachine"
 )
 
 func main() {
@@ -28,7 +26,7 @@ func main() {
 	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
 	flag.Parse()
 
-	log := ctrl.Log.WithName("kubevm-controller")
+	log := ctrl.Log.WithName("vm-api-controller")
 	ctrl.SetLogger(log)
 
 	scheme := runtime.NewScheme()
@@ -36,8 +34,8 @@ func main() {
 		log.Error(err, "unable to add client-go scheme")
 		os.Exit(1)
 	}
-	if err := kubevmv1a1.AddToScheme(scheme); err != nil {
-		log.Error(err, "unable to add kube-vm.io scheme")
+	if err := vmv1alpha1.AddToScheme(scheme); err != nil {
+		log.Error(err, "unable to add vm-api.io scheme")
 		os.Exit(1)
 	}
 

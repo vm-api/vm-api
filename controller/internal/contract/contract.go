@@ -2,7 +2,7 @@
 // The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
 // SPDX-License-Identifier: Apache-2.0
 
-// Package contract reads the fixed status paths every kube-vm.io provider
+// Package contract reads the fixed status paths every vm-api.io provider
 // object is expected to surface, per the generic API's duck-typed status
 // contract. It never imports a provider's Go types — every read goes
 // through unstructured.Unstructured — so the core stays provider-agnostic.
@@ -17,8 +17,7 @@ import (
 // condition types the core reads off a provider object's status.conditions,
 // mirroring them onto the generic object. Named InfrastructureReady, not
 // Ready, because a provider may already reserve the literal "Ready" type for
-// its own, differently-scoped meaning (VM Operator does: its guest
-// readiness-probe result).
+// its own, differently-scoped meaning, such as a guest readiness-probe result.
 const (
 	InfrastructureReadyConditionType = "InfrastructureReady"
 	UpToDateConditionType            = "UpToDate"

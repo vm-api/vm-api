@@ -2,7 +2,7 @@
 
 An infrastructure provider reconciles portable `VirtualMachine` intent against a specific platform. It owns the platform integration, exposes a Kubernetes resource for infrastructure-specific configuration, and publishes state through the shared provider contract.
 
-This guide describes integration with the current `kube-vm.io/v1alpha1` API and [generic controller](../controller/controllers/virtualmachine/). Provider implementations are separate from this repository.
+This guide describes integration with the current `vm-api.io/v1alpha1` API and [generic controller](../controller/controllers/virtualmachine/). Provider implementations are separate from this repository.
 
 ## Provider status contract
 
@@ -25,7 +25,7 @@ The core does not read or write the provider resource's spec. It does modify own
 The user or a higher-level controller creates both the generic VM and the provider resource in the same namespace.
 
 1. Set the generic VM's `spec.infrastructureRef` to the provider resource's API group, kind, and name.
-2. Set the provider resource's `kube-vm.io/virtual-machine` annotation to the generic VM's name.
+2. Set the provider resource's `vm-api.io/virtual-machine` annotation to the generic VM's name.
 3. Before modifying platform resources, verify that both objects refer to each other.
 
 The generic controller resolves the provider's preferred served version using Kubernetes discovery. It checks the backlink before adoption and records a controller owner reference on the provider resource. The infrastructure reference is immutable after creation; see the [VirtualMachine types](../api/v1alpha1/virtualmachine_types.go).

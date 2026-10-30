@@ -13,7 +13,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	"github.com/vmware-tanzu/vm-operator/external/kubevm/controller/internal/contract"
+	"github.com/vm-api/vm-api/controller/internal/contract"
 )
 
 func TestContract(t *testing.T) {

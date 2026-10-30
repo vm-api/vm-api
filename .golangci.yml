@@ -1,8 +1,3 @@
-# Modeled on the parent vm-operator repo's .golangci.yml, trimmed for a module
-# that contains only API types and generated code.
-#
-# This module carries its own config rather than inheriting the parent's,
-# because it is expected to move to its own repository.
 version: "2"
 
 run:
@@ -14,11 +9,9 @@ formatters:
   - goimports
   settings:
     goimports:
-      # Put VMware imports after any third-party packages, matching the parent
-      # repo's convention.
+      # Put project imports after third-party packages.
       local-prefixes:
-      - github.com/vmware
-      - github.com/vmware-tanzu
+      - github.com/vm-api/vm-api
 
 linters:
   enable:

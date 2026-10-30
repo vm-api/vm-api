@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // +kubebuilder:object:generate=true
-// +groupName=kube-vm.io
+// +groupName=vm-api.io
 
-// Package v1alpha1 contains the KubeVM generic, provider-agnostic virtual
+// Package v1alpha1 contains the VM API generic, provider-agnostic virtual
 // machine API.
 //
 // The API is deliberately portable: it carries the concepts that are common
@@ -24,8 +24,8 @@ var (
 	// GroupName is the API group for the generic VM API.
 	//
 	// Provider groups are expected to derive from this one, for example
-	// infrastructure.vsphere.kube-vm.io.
-	GroupName = "kube-vm.io"
+	// infrastructure.vsphere.vm-api.io.
+	GroupName = "vm-api.io"
 
 	// GroupVersion is group version used to register these objects.
 	GroupVersion = schema.GroupVersion{Group: GroupName, Version: "v1alpha1"}
