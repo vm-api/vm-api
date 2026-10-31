@@ -177,7 +177,7 @@ typos: ## Detect typos
 ##@ Verification
 
 .PHONY: verify
-verify: build lint-go-full verify-codegen ## Run static analysis and verify generated code
+verify: verify-codegen ## Verify generated code is up to date
 
 .PHONY: verify-codegen
 verify-codegen: ## Verify generated code

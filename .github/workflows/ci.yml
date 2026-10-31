@@ -1,6 +1,6 @@
 name: ci
 
-# Run separate lint jobs for main and release-branch pull requests.
+# Build, verify generated code, test, and lint main and release-branch pull requests.
 on:
   pull_request:
     branches:
@@ -44,6 +44,78 @@ jobs:
           go-version-file: '${{ matrix.directory }}/go.mod'
           cache-dependency-path: '**/go.sum'
       - name: Lint Go
+        working-directory: ${{ matrix.directory }}
+        run: make ${{ matrix.target }}
+
+  verify-codegen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
+          cache-dependency-path: '**/go.sum'
+      - name: Verify generated code
+        run: make verify
+
+  build:
+    name: build-${{ matrix.module }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: api
+            directory: .
+            target: build
+          - module: controller
+            directory: controller
+            target: manager
+    steps:
+      - name: Check out code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: '${{ matrix.directory }}/go.mod'
+          cache-dependency-path: '**/go.sum'
+      - name: Build
+        working-directory: ${{ matrix.directory }}
+        run: make ${{ matrix.target }}
+
+  test:
+    name: test-${{ matrix.module }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - module: api
+            directory: .
+            target: test
+          - module: controller
+            directory: controller
+            target: test
+    steps:
+      - name: Check out code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Install Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: '${{ matrix.directory }}/go.mod'
+          cache-dependency-path: '**/go.sum'
+      - name: Test
         working-directory: ${{ matrix.directory }}
         run: make ${{ matrix.target }}
 

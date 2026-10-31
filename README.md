@@ -48,7 +48,8 @@ make help              # List available targets
 make generate          # Generate deepcopy code and CRDs
 make build             # Build the API module
 make test              # Test the API module
-make verify            # Build, lint, and verify generated files
+make verify            # Verify generated files are up to date
+make lint-go-full      # Run Go lint checks
 make modules           # Tidy API module dependencies
 ```
 
@@ -65,7 +66,7 @@ The controller test target installs its Ginkgo and envtest dependencies. Root co
 
 The optional `make lint-markdown` and `make typos` targets use container images. Their current defaults require access to a private registry; contributors without that access must supply compatible images through `MDLINT_IMAGE` and `TYPOS_IMAGE`. The build, Go lint, and code-generation checks do not require that registry.
 
-The [CI workflow](.github/workflows/ci.yml) runs the API and controller Go lint targets, Markdown lint, and typo checks for pull requests to `main` and release branches, and pushes to `main`. It installs public tools without private registry credentials. To run the same documentation checks locally with installed tools:
+The [CI workflow](.github/workflows/ci.yml) runs separate checks for generated code (`make verify`), API build (`make build`), controller build (`make -C controller manager`), API tests (`make test`), controller envtest tests (`make -C controller test`), Go lint, Markdown lint, and typos. These run for pull requests to `main` and release branches, and pushes to `main`. Verification regenerates files and compares their contents; it does not inspect local staging or commit status. It installs public tools without private registry credentials. To run the same documentation checks locally with installed tools:
 
 ```bash
 # Install markdownlint-cli 0.44.0 and typos 1.40.0 first.
