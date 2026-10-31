@@ -3,3 +3,6 @@ hack/tools/bin/
 
 # macOS Finder metadata.
 .DS_Store
+
+# Local smoke-test diagnostics.
+_artifacts/
