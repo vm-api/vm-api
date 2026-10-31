@@ -22,6 +22,7 @@ VM API follows the [CNCF Community Code of Conduct](https://github.com/cncf/foun
 ## Documentation
 
 - [Implementing a provider](docs/implementing-a-provider.md)
+- [Testing and provider infrastructure requirements](docs/testing.md)
 - [Development roadmap](ROADMAP.md)
 - [Example VirtualMachine](config/samples/virtualmachine.yaml)
 
@@ -48,6 +49,7 @@ make help              # List available targets
 make generate          # Generate deepcopy code and CRDs
 make build             # Build the API module
 make test              # Test the API module
+make test-smoke        # Check CRD and VM create/read on a disposable kind cluster
 make verify            # Verify generated files are up to date
 make lint-go-full      # Run Go lint checks
 make modules           # Tidy API module dependencies
@@ -62,7 +64,7 @@ make lint
 make test
 ```
 
-The controller test target installs its Ginkgo and envtest dependencies. Root code-generation and lint tools are installed on demand at pinned versions defined in the [Makefile](Makefile).
+The controller test target installs its Ginkgo and envtest dependencies. Root code-generation and lint tools are installed on demand at pinned versions defined in the [tooling Makefile](hack/tools/Makefile).
 
 The optional `make lint-markdown` and `make typos` targets use container images. Their current defaults require access to a private registry; contributors without that access must supply compatible images through `MDLINT_IMAGE` and `TYPOS_IMAGE`. The build, Go lint, and code-generation checks do not require that registry.
 

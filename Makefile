@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # API code generation, dependency management, and validation targets.
-# Development tools are installed at pinned versions below.
+# Development tool installation is delegated to hack/tools/Makefile.
 
 SHELL := /usr/bin/env bash
 .SHELLFLAGS := -euo pipefail -c
@@ -20,11 +20,12 @@ CRD_ROOT      := $(ROOT_DIR)/config/crd/bases
 
 # Tooling binaries.
 CONTROLLER_GEN := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/controller-gen
+KUBECTL       := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/kubectl
+KIND          := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/kind
 GOLANGCI_LINT  := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/golangci-lint
 
-# Pinned development tool versions.
-CONTROLLER_TOOLS_VERSION := v0.21.0
-GOLANGCI_LINT_VERSION    := v2.1.6
+# Pinned smoke-test node image.
+KIND_NODE_IMAGE ?= kindest/node:v1.34.11@sha256:44e222ee2132dab25ff87301682f89eb82c7880ea3a1bf543bfe9708fd08d67d
 
 # The license header applied to generated Go sources.
 BOILERPLATE := ./hack/boilerplate/boilerplate.generatego.txt
@@ -53,18 +54,17 @@ help: ## Display this help
 ## --------------------------------------
 ##@ Tooling
 
-$(CONTROLLER_GEN):
-	GOBIN=$(ROOT_DIR)/$(TOOLS_BIN_DIR) \
-	go install sigs.k8s.io/controller-tools/cmd/controller-gen@$(CONTROLLER_TOOLS_VERSION)
 
-$(GOLANGCI_LINT):
-	GOBIN=$(ROOT_DIR)/$(TOOLS_BIN_DIR) \
-	go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
+TOOLING_BINARIES := $(CONTROLLER_GEN) $(GOLANGCI_LINT) $(KIND) $(KUBECTL)
 
-TOOLING_BINARIES := $(CONTROLLER_GEN) $(GOLANGCI_LINT)
+# Always delegate freshness checks; the tooling Makefile owns installation.
+.PHONY: tools FORCE
+FORCE:
+$(TOOLING_BINARIES): FORCE
+	$(MAKE) -C $(TOOLS_DIR) $(notdir $@)
 
-.PHONY: tools
-tools: $(TOOLING_BINARIES) ## Build tooling binaries
+tools: ## Install code generation, lint, and smoke-test tools
+	$(MAKE) -C $(TOOLS_DIR) tools
 
 ## --------------------------------------
 ## Generate
@@ -119,6 +119,10 @@ build: ## Compile the module
 .PHONY: test
 test: ## Run tests
 	go test ./...
+
+.PHONY: test-smoke
+test-smoke: $(KIND) $(KUBECTL) ## Test CRD installation and VM create/read on a disposable kind cluster
+	KIND="$(KIND)" KUBECTL="$(KUBECTL)" KIND_NODE_IMAGE="$(KIND_NODE_IMAGE)" bash hack/smoke/kind.sh
 
 ## --------------------------------------
 ## Linting
@@ -203,4 +207,4 @@ verify-codegen: ## Verify generated code
 
 .PHONY: clean
 clean: ## Remove all generated tooling
-	@rm -rf $(TOOLS_DIR)/bin
+	$(MAKE) -C $(TOOLS_DIR) clean

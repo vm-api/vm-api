@@ -1,0 +1,29 @@
+# API-only fixture: these references are deliberately not backed by a provider.
+apiVersion: vm-api.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: smoke-vm
+spec:
+  instanceType:
+    name: smoke-small
+  bootDisk:
+    sizeGiB: 20
+    source:
+      image:
+        apiGroup: infrastructure.example.com
+        kind: Image
+        name: smoke-image
+  network:
+    interfaces:
+      - name: eth0
+        dhcp4: true
+        network:
+          apiGroup: infrastructure.example.com
+          kind: Network
+          name: smoke-network
+  tags:
+    purpose: api-smoke
+  infrastructureRef:
+    apiGroup: infrastructure.example.com
+    kind: ExampleVirtualMachine
+    name: smoke-provider-vm
