@@ -15,6 +15,10 @@ A `VirtualMachine` describes compute, storage, networking, guest bootstrap, and 
 
 The current API is `vm-api.io/v1alpha1`. API evolution and provider compatibility are active development areas; see the [roadmap](ROADMAP.md). The API group shown here matches the checked-in types and manifests.
 
+## Community
+
+VM API follows the [CNCF Community Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md). See our [Code of Conduct](CODE_OF_CONDUCT.md) for private reporting guidance.
+
 ## Documentation
 
 - [Implementing a provider](docs/implementing-a-provider.md)
