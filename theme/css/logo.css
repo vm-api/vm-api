@@ -1,0 +1,24 @@
+/* Show the dark-on-light logo on the light themes and the white logo on the dark
+   themes (coal, navy, ayu). mdBook sets the theme name as a class on <html>. */
+.logo {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto 2rem;
+}
+
+.logo-dark {
+  display: none;
+}
+
+.coal .logo-light,
+.navy .logo-light,
+.ayu .logo-light {
+  display: none;
+}
+
+.coal .logo-dark,
+.navy .logo-dark,
+.ayu .logo-dark {
+  display: block;
+}

@@ -23,6 +23,7 @@ CONTROLLER_GEN := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/controller-gen
 KUBECTL       := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/kubectl
 KIND          := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/kind
 GOLANGCI_LINT  := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/golangci-lint
+MDBOOK        := $(ROOT_DIR)/$(TOOLS_BIN_DIR)/mdbook
 
 # Pinned smoke-test node image.
 KIND_NODE_IMAGE ?= kindest/node:v1.34.11@sha256:44e222ee2132dab25ff87301682f89eb82c7880ea3a1bf543bfe9708fd08d67d
@@ -55,7 +56,7 @@ help: ## Display this help
 ##@ Tooling
 
 
-TOOLING_BINARIES := $(CONTROLLER_GEN) $(GOLANGCI_LINT) $(KIND) $(KUBECTL)
+TOOLING_BINARIES := $(CONTROLLER_GEN) $(GOLANGCI_LINT) $(KIND) $(KUBECTL) $(MDBOOK)
 
 # Always delegate freshness checks; the tooling Makefile owns installation.
 .PHONY: tools FORCE
@@ -65,6 +66,19 @@ $(TOOLING_BINARIES): FORCE
 
 tools: ## Install code generation, lint, and smoke-test tools
 	$(MAKE) -C $(TOOLS_DIR) tools
+
+## --------------------------------------
+## Docs
+## --------------------------------------
+##@ Docs
+
+.PHONY: docs-build
+docs-build: $(MDBOOK) ## Build the documentation site into ./book
+	$(MDBOOK) build
+
+.PHONY: docs-serve
+docs-serve: $(MDBOOK) ## Serve the documentation site at http://localhost:3000
+	$(MDBOOK) serve --open
 
 ## --------------------------------------
 ## Generate

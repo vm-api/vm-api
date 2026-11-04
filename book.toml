@@ -1,0 +1,21 @@
+[book]
+title = "VM API"
+description = "A portable, provider-neutral Kubernetes API for virtual machines."
+authors = ["The VM API Maintainers"]
+src = "docs"
+language = "en"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+smart-punctuation = true
+additional-css = ["theme/css/logo.css"]
+git-repository-url = "https://github.com/vm-api/vm-api"
+edit-url-template = "https://github.com/vm-api/vm-api/edit/main/{path}"
+
+# Once the vm-api.io DNS records are in place, uncomment so mdBook emits a CNAME
+# file in the build output and the custom domain survives each Pages deploy:
+# cname = "vm-api.io"

@@ -6,9 +6,9 @@ VM API separates portable virtual machine configuration from infrastructure-spec
 
 | Component | Responsibility |
 |---|---|
-| [VirtualMachine API](../api/v1alpha1/) | Portable compute, storage, network, bootstrap, and power-state configuration |
-| [Generic controller](../controller/controllers/virtualmachine/) | Provider-resource adoption, lifecycle coordination, and generic VM status |
-| [Provider status contract](../controller/internal/contract/contract.go) | Common fields and conditions read without provider-specific Go imports |
+| [VirtualMachine API](https://github.com/vm-api/vm-api/tree/main/api/v1alpha1/) | Portable compute, storage, network, bootstrap, and power-state configuration |
+| [Generic controller](https://github.com/vm-api/vm-api/tree/main/controller/controllers/virtualmachine/) | Provider-resource adoption, lifecycle coordination, and generic VM status |
+| [Provider status contract](https://github.com/vm-api/vm-api/blob/main/controller/internal/contract/contract.go) | Common fields and conditions read without provider-specific Go imports |
 | Infrastructure provider | Platform-specific configuration, provisioning, observation, and cleanup |
 
 The current API group and version are `vm-api.io/v1alpha1`.
@@ -27,6 +27,6 @@ Portable fields describe shared intent. Provider-specific configuration remains 
 
 ## Versioning and development
 
-The API currently serves `v1alpha1`. Provider contract versioning, conformance, companion catalogs, and additional API versions are tracked in the [roadmap](../ROADMAP.md). Future schema changes require explicit compatibility and upgrade guidance.
+The API currently serves `v1alpha1`. Provider contract versioning, conformance, companion catalogs, and additional API versions are tracked in the [roadmap](https://github.com/vm-api/vm-api/blob/main/ROADMAP.md). Future schema changes require explicit compatibility and upgrade guidance.
 
 See [Implementing a provider](implementing-a-provider.md) for integration requirements. The source and generated manifests in this repository describe the current implementation.
