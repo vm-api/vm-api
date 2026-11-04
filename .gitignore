@@ -6,3 +6,6 @@ hack/tools/bin/
 
 # Local smoke-test diagnostics.
 _artifacts/
+
+# Built documentation site ("make docs-build").
+/book/
