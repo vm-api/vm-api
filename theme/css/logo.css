@@ -22,3 +22,73 @@
 .ayu .logo-dark {
   display: block;
 }
+
+/* Linux Foundation / LF Projects footer (see theme/index.hbs): a full-width dark
+   band in the style of velero.io, identical in every theme. The content area is
+   sized so the footer is visible without scrolling on short pages. */
+:root {
+  --lf-footer-height: 23rem;
+}
+
+.content {
+  box-sizing: border-box;
+  min-height: calc(100vh - 2 * var(--menu-bar-height) - var(--lf-footer-height));
+}
+
+.lf-footer {
+  box-sizing: border-box;
+  min-height: var(--lf-footer-height);
+  margin: 0 calc(0px - var(--page-padding));
+  padding: 2.5rem 1.5rem;
+  background: #1f2933;
+  color: #cbd2d9;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+.lf-footer-inner {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+}
+
+.lf-footer a:link,
+.lf-footer a:visited {
+  color: #f5b800;
+}
+
+.lf-footer-logo img {
+  display: block;
+  width: 100%;
+  max-width: 160px;
+  margin: 0 auto 1.25rem;
+}
+
+.lf-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.lf-footer p {
+  margin: 0.25rem 0;
+  line-height: 1.5;
+}
+
+.lf-footer a {
+  text-decoration: none;
+}
+
+.lf-footer a:hover {
+  text-decoration: underline;
+}
+
+.lf-footer-cncf-logo img {
+  display: block;
+  width: 100%;
+  max-width: 220px;
+  margin: 0.75rem auto 1.5rem;
+}
